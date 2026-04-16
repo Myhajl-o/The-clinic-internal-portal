@@ -1,8 +1,10 @@
 #include "choiceServices.hpp"
 #include <iostream>
+#include <cstdlib>
 #include <string>
 #include <vector>
 #include <memory>
+#include <ctime>
 using namespace std;
 
 double choiceServices::checkNumber(){
@@ -21,7 +23,7 @@ string choiceServices::newType(){
         cout<<"Введіть тип послуги: ";
         string type;
         getline(cin, type);
-        if(type.size()>3&&type.size()<20){
+        if(type.size()>3&&type.size()<40){
             return type;
         }else{
             cout<<"НЕ корректно введений тип;"<<endl;
@@ -33,7 +35,7 @@ string choiceServices::newName(){
         cout<<"Введіть назву послуги: ";
         string name;
         getline(cin,name);
-        if(name.size()>3&&name.size()<30){
+        if(name.size()>3&&name.size()<60){
             return name;
         }else{
             cout<<"НЕ корректно введена назва"<<endl;
@@ -45,7 +47,7 @@ string choiceServices::newDiagnosis(){
         cout<<"Введіть обгрунтування процедури (діагноз): ";
         string diagnosis;
         getline(cin, diagnosis);
-        if(diagnosis.size()>3&&diagnosis.size()<30){
+        if(diagnosis.size()>3&&diagnosis.size()<60){
             return diagnosis;
         }else{
             cout<<"НЕ корректно введений діагноз"<<endl;
@@ -57,7 +59,7 @@ string choiceServices::newDoctor(){
         cout<<"Введіть прізвище та ініціали лікаря: ";
         string doctor;
         getline(cin,doctor);
-        if(doctor.size()>3&&doctor.size()<30){
+        if(doctor.size()>3&&doctor.size()<60){
             return doctor;
         }else{
             cout<<"НЕ корректно введено Прізвище та ініціали лікаря"<<endl;
@@ -67,7 +69,7 @@ string choiceServices::newDoctor(){
 int choiceServices::newTime(){
     while(true){
         cout<<"Введіть час проведення процедури: ";
-        if(int time=checkNumber();time>0&&time<120){
+        if(int time=checkNumber();time>4&&time<120){
             return time;
         }else{
             cout<<"НЕ корректно введений час"<<endl;
@@ -84,9 +86,11 @@ double choiceServices::newPrice(){
         }
     }
 }
+void choiceServices::createS(string type, string name, string diag, string doc, int time, double price) {
+    medic.push_back(make_unique<MedicalServices>(type, name, diag, doc, time, price));
+}
 void choiceServices::createService(){
-    medic.push_back(make_unique<MedicalServices>(newType(),
-    newName(),newDiagnosis(),newDoctor(),newTime(),newPrice()));
+    createS(newType(),newName(),newDiagnosis(),newDoctor(),newTime(),newPrice());
     cout<<"Нову послугу успішно створено"<<endl;
     medic[medic.size()-1]->printService();
 }
@@ -97,6 +101,20 @@ void choiceServices::printSelectService(){
     }
     cout<<"\n0. Назад\n";
 }
+void choiceServices::editServices(){
+    printSelectService();
+    while(true){
+        cout<<"Введіть число: ";
+        if(int index=checkNumber();index==0){
+            return;
+        }else if(index>0&&index<=medic.size()){
+            medic[index-1]->editingServices();
+            return;
+        }else{
+            cout<<"НЕ корректно введене число"<<endl;
+        }
+    }
+}
 void choiceServices::eraseService(int index){
     medic.erase(medic.begin()+index);
 }
@@ -106,7 +124,7 @@ void choiceServices::delateService(){
         cout<<"Введіть число: ";
         if(int index=checkNumber();index==0){
             return;
-        }else if(index>0&&index<medic.size()){
+        }else if(index>0&&index<=medic.size()){
             eraseService(index-1);
             cout<<"\nПослугу успішно видалено"<<endl;
             return;
@@ -131,7 +149,7 @@ string choiceServices::newPatient(){
         cout<<"Введіть прізвище та ініціали пацієнта: ";
         string patient;
         getline(cin,patient);
-        if(patient.size()>3&&patient.size()<30){
+        if(patient.size()>3&&patient.size()<60){
             return patient;
         }else{
             cout<<"НЕ корректно введено Прізвище та ініціали пацієнта"<<endl;
@@ -141,65 +159,124 @@ string choiceServices::newPatient(){
 int choiceServices::newYear(){
     while(true){
         cout<<"Введіть рік: ";
-        if(int year=checkNumber();year>2020&&year<2027){
+        if(int year=checkNumber();year>2020&&year<=now->tm_year+1900){
+            tempYear=year;
             return year;
         }else{
             cout<<"НЕ корректно введене число"<<endl;
         }
     }
 }
+int choiceServices::getMonth(){
+    if(tempYear!=now->tm_year+1900){
+        return 12;
+    }else{
+        return now->tm_mon + 1;
+    }
+}
 int choiceServices::newMonth(){
     while(true){
         cout<<"Введіть місяць: ";
-        if(int month=checkNumber();month>0&&month<13){
+        if(int month=checkNumber();month>0&&month<=getMonth()){
+            tempMonth=month;
             return month;
         }else{
             cout<<"НЕ корректно введене число"<<endl;
         }
     }
 }
+int choiceServices::getDay(){
+    if(tempYear!=now->tm_year+1900){
+        if(tempMonth==4||tempMonth==6||tempMonth==9||tempMonth==11){
+            return 30;
+        }else if(tempMonth==2){
+            return 28;
+        }else{
+            return 31;
+        }
+    }else{
+        if(tempMonth!=now->tm_mon+1){
+            if(tempMonth==4||tempMonth==6||tempMonth==9||tempMonth==11){
+                return 30;
+            }else if(tempMonth==2){
+                return 28;
+            }else{
+                return 31;
+            }
+        }else{
+            return now->tm_mday;
+        }
+    }
+}
 int choiceServices::newDay(){
     while(true){
         cout<<"Введіть число: ";
-        if(int day=checkNumber();day>0&&day<31){
+        if(int day=checkNumber();day>0&&day<=getDay()){
+            tempDay=day;
             return day;
         }else{
             cout<<"НЕ корректно введене число"<<endl;
         }
     }
 }
+int choiceServices::getHour(){
+    if(tempYear==now->tm_year+1900&&tempMonth==now->tm_mon+1&&tempDay==now->tm_mday){
+        return now->tm_hour; 
+    }else{
+        return 17;
+    }
+}
 int choiceServices::newHour(){
     while(true){
         cout<<"Введіть годину: ";
-        if(int hour=checkNumber();hour>8&&hour<17){
+        if(int hour=checkNumber();hour>=8&&hour<=getHour()){
+            tempHour=hour;
             return hour;
         }else{
             cout<<"НЕ корректно введене число"<<endl;
         }
     }
 }
+int choiceServices::getMinute(){
+    if(tempYear==now->tm_year+1900&&tempMonth==now->tm_mon+1&&tempDay==now->tm_mday&&tempHour==now->tm_hour){
+        return now->tm_min;
+    }else{
+        return 59;
+    }
+}
 int choiceServices::newMinute(){
     while(true){
         cout<<"Введіть хвилину: ";
-        if(int minute=checkNumber();minute>0&&minute<60){
+        if(int minute=checkNumber();minute>0&&minute<=getMinute()){
             return minute;
         }else{
             cout<<"НЕ корректно введене число"<<endl;
         }
     }
 }
-void choiceServices::createHistoryService(){
-    string patient=newPatient();
-    int year=newYear();
-    int month=newMonth();
-    int day=newDay();
-    int hour=newHour();
-    int minute=newMinute();
-    int index=newService();
-    if(index==0){
-        return;
+void choiceServices::createHS(string pat, int y, int m, int d, int h, int mi, int index){
+    if(index>=0&&medic.size()>0){
+        history.push_back(make_unique<History>(pat, y, m, d, h, mi,index,move(medic[index - 1]->clone())));
     }
-    history.push_back(make_unique<History>(patient,year,month,day,hour,minute,medic[index-1]->clone()));
+}
+void choiceServices::createHistoryService(){
+    t = time(nullptr);
+    now = localtime(&t);
+    if(now->tm_hour>=8&&now->tm_hour<=17){
+        string patient=newPatient();
+        int year=newYear();
+        int month=newMonth();
+        int day=newDay();
+        int hour=newHour();
+        int minute=newMinute();
+        int index=newService();
+        if(index==0){
+            return;
+        }
+        createHS(patient,year,month,day,hour,minute,index);
+    }else{
+        cout<<"Функція створення запису працює з 8:00 до 17:00"<<endl;
+    }
 }
 void choiceServices::printFullHistory(){
     for(int index=0;index<history.size();index++){
@@ -212,28 +289,28 @@ void choiceServices::printFullHistory(){
 bool choiceServices::sortingLogic(int index){
     if (history[index - 1]->getYear() < history[index]->getYear()) return true;
     if (history[index - 1]->getYear() > history[index]->getYear()) {
-        std::swap(history[index - 1], history[index]);
+        swap(history[index - 1], history[index]);
         return false;
     }
     if (history[index - 1]->getMonth() < history[index]->getMonth()) return true;
     if (history[index - 1]->getMonth() > history[index]->getMonth()) {
-        std::swap(history[index - 1], history[index]);
+        swap(history[index - 1], history[index]);
         return false;
     }
     if (history[index - 1]->getDay() < history[index]->getDay()) return true;
     if (history[index - 1]->getDay() > history[index]->getDay()) {
-        std::swap(history[index - 1], history[index]);
+        swap(history[index - 1], history[index]);
         return false;
     }
     if (history[index - 1]->getHour() < history[index]->getHour()) return true;
     if (history[index - 1]->getHour() > history[index]->getHour()) {
-        std::swap(history[index - 1], history[index]);
+        swap(history[index - 1], history[index]);
         return false;
     }
     if (history[index - 1]->getMinute() <= history[index]->getMinute()) {
         return true;
     } else {
-        std::swap(history[index - 1], history[index]);
+        swap(history[index - 1], history[index]);
         return false;
     }
 }
@@ -252,9 +329,11 @@ void choiceServices::sortingHictory(){
 }
 pair<double,double> choiceServices::AllProfit(){
     double fsum=0,sum=0;
+    t = time(nullptr);
+    now = localtime(&t);
     for(unique_ptr<History>& h:history){
         fsum+=h->getProfit();
-        if(h->getMonth()==4&&h->getYear()==2026){
+        if(h->getMonth()==now->tm_mon+1&&h->getYear()==now->tm_year+1900){
             sum+=h->getProfit();
         }
     }
@@ -275,32 +354,44 @@ void choiceServices::FinancialStatement(){
 void choiceServices::printAction(){
     cout<<"\n\n1. Перегляд активних послуг;"<<endl;
     cout<<"2. Додати послугу;"<<endl;
-    cout<<"3. Видалити послугу;"<<endl;
-    cout<<"4. Див. бухгалтерський звіт;"<<endl;
-    cout<<"5. Додати виконану послугу"<<endl;
+    cout<<"3. Редагувати активну послугу;"<<endl;
+    cout<<"4. Видалити послугу;"<<endl;
+    cout<<"5. Див. бухгалтерський звіт;"<<endl;
+    cout<<"6. Додати виконану послугу"<<endl;
     cout<<"0. Вихід"<<endl;
 }
 bool choiceServices::switchAction(){
     printAction();
     switch(static_cast<int>(checkNumber())){
         case 0:
+            system("cls");
             return true;
         case 1:
+            system("cls");
             printSelectService();
             return false;
         case 2:
+            system("cls");
             createService();
             return false;
         case 3:
-            delateService();
+            system("cls");
+            editServices();
             return false;
         case 4:
-            FinancialStatement();
+            system("cls");
+            delateService();
             return false;
         case 5:
+            system("cls");
+            FinancialStatement();
+            return false;
+        case 6:
+            system("cls");
             createHistoryService();
             return false;
         default:
+            system("cls");
             cout<<"НЕ корректно введена дія"<<endl;
             return false;
     }
@@ -311,4 +402,10 @@ void choiceServices::choiceAction(){
             return;
         }
     }
+}
+vector<unique_ptr<MedicalServices>>& choiceServices::getMedic(){
+    return medic;
+}
+vector<unique_ptr<History>>& choiceServices::getHistory() {
+    return history;
 }

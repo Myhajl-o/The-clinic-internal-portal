@@ -1,14 +1,79 @@
 #include "choiceServices.hpp"
+#include <string>
+#include <fstream>
 using namespace std;
+void readingFile(choiceServices& med){
+    ifstream file("Services.hms");
+    if (!file.is_open()) return;
+    string type, name, diagn, doc, timeStr, priceStr;
+    while (getline(file, type, '|')) {
+        getline(file, name, '|');
+        getline(file, diagn, '|');
+        getline(file, doc, '|');
+        getline(file, timeStr, '|');
+        getline(file, priceStr, '\n');
+
+        if (!type.empty()) {
+            med.createS(type, name, diagn, doc, stoi(timeStr), stod(priceStr));
+        }
+    }
+    file.close();
+}
+
+void readHistoryFile(choiceServices& med) {
+    ifstream file("HistoryServices.hms");
+    if (!file.is_open()) return;
+
+    string pat, yearStr, monthStr, dayStr, hourStr, minStr, indexStr;
+
+    while (getline(file, pat, '|')) {
+        getline(file, yearStr, '|');
+        getline(file, monthStr, '|');
+        getline(file, dayStr, '|');
+        getline(file, hourStr, '|');
+        getline(file, minStr, '|');
+        getline(file, indexStr, '\n');
+
+        if (!pat.empty()) {
+            med.createHS(pat, stoi(yearStr), stoi(monthStr), stoi(dayStr), stoi(hourStr), stoi(minStr), stoi(indexStr));
+        }
+    }
+    file.close();
+}
+
+void writeFile(vector<unique_ptr<MedicalServices>>& med){
+    ofstream file("Services.hms");
+    if (!file.is_open()) return;
+    for (unique_ptr<MedicalServices>& m : med) {
+        file << m->getType() << '|'
+             << m->getName() << '|'
+             << m->getDiagnosis() << '|'
+             << m->getDoctor() << '|'
+             << m->getTime() << '|'
+             << m->getPrice() << '\n';
+    }
+    file.close();
+}
+void writeHiistoryFile(vector<unique_ptr<History>>& history){
+    ofstream file("HistoryServices.hms");
+    if (!file.is_open()) return;
+    for(unique_ptr<History>& h:history){
+        file<<h->getPatient()<<'|'
+            <<h->getYear()<<'|'
+            <<h->getMonth()<<'|'
+            <<h->getDay()<<'|'
+            <<h->getHour()<<'|'
+            <<h->getMinute()<<'|'
+            <<h->getIndex()<<'\n';
+    }
+    file.close();
+}
 int main () {
     choiceServices clinic;
-
-    clinic.addTestService("Стоматологія", "Лікування карієсу", "Карієс середнього ступеня", "Лобанов С.В.", 45, 1200.00);
-    clinic.addTestService("Діагностика", "УЗД черевної порожнини", "Біль у животі", "Купітман І.Н.", 20, 650.50);
-    clinic.addTestService("Терапія", "Первинна консультація", "ГРВІ, температура", "Биков А.Є.", 15, 400.00);
-    clinic.addTestHistory("Шевченко О.М.", 2026, 4, 15, 10, 9, 2);
-    clinic.addTestHistory("Коваленко І.І.", 2026, 4, 10, 14, 00, 1);
-    clinic.addTestHistory("Ткачук В.П.", 2026, 2, 28, 9, 15, 3);
+    readingFile(clinic);
+    readHistoryFile(clinic);
     clinic.choiceAction();
+    writeFile(clinic.getMedic());
+    writeHiistoryFile(clinic.getHistory());
     return 0;
 }

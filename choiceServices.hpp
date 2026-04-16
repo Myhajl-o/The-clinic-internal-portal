@@ -5,10 +5,21 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <ctime>
 class choiceServices{
     private:
     std::vector<std::unique_ptr<MedicalServices>>medic;
     std::vector<std::unique_ptr<History>>history;
+    time_t t;
+    tm* now;
+    int tempYear;
+    int tempMonth;
+    int tempDay;
+    int tempHour;
+    int getMonth();
+    int getDay();
+    int getHour();
+    int getMinute();
     double checkNumber();
     std::string newType();
     std::string newName();
@@ -18,6 +29,7 @@ class choiceServices{
     double newPrice();
     void createService();
     void printSelectService();
+    void editServices();
     void eraseService(int index);
     void delateService();
     int newService();
@@ -37,18 +49,9 @@ class choiceServices{
     void printAction();
     bool switchAction();
     public:
-    void addTestService(std::string type, std::string name, std::string diag, std::string doc, int time, double price) {
-        medic.push_back(std::make_unique<MedicalServices>(type, name, diag, doc, time, price));
-    }
-    void addTestHistory(std::string pat, int y, int m, int d, int h, int mi, int serviceIndex) {
-        if (serviceIndex > 0 && serviceIndex <= medic.size()) {
-            history.push_back(std::make_unique<History>(
-                pat, y, m, d, h, mi, 
-                std::move(medic[serviceIndex - 1]->clone())
-            ));
-        }
-    }
     void choiceAction();
-
+    std::vector<std::unique_ptr<MedicalServices>>& getMedic();
+    std::vector<std::unique_ptr<History>>& getHistory();
+    void createS(std::string type, std::string name, std::string diag, std::string doc, int time, double price);
+    void createHS(std::string pat, int y, int m, int d, int h, int mi, int index);
 };
-//spy.erase(spy.begin()+index);

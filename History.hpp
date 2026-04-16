@@ -8,10 +8,11 @@ class History{
     std::string patient;
     std::unique_ptr<Date>date;
     std::unique_ptr<MedicalServices>service; 
+    int index;
     public:
     History(std::string pat, int y, int m, int d, int h, int mi,
-        std::unique_ptr<MedicalServices> s) : 
-        patient(pat){
+        int index,std::unique_ptr<MedicalServices> s) : 
+        patient(pat),index(index){
         date = std::make_unique<Date>(y, m, d, h, mi);
         service = std::move(s); 
     }
@@ -23,4 +24,5 @@ class History{
     int getDay();
     int getHour();
     int getMinute();
+    int getIndex();
 };

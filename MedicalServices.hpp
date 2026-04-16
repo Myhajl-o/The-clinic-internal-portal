@@ -9,34 +9,7 @@ class MedicalServices{
     std::string doctor;
     int time;
     double price;
-    std::string getType(){
-        return typeServices;
-    }
-    std::string getName(){
-        return nameServices;
-    }
-    std::string getDiagnosis(){
-        return diagnosis;
-    }
-    std::string getDoctor(){
-        return doctor;
-    }
-    int getTime(){
-        return time;
-    }
 
-    public:
-    
-    MedicalServices(std::string type,std::string name,
-        std::string diagn,std::string doc,int time,double price):typeServices(type),
-        nameServices(name),diagnosis(diagn),doctor(doc),
-        time(time),price(price){}
-    
-    double getPrice(){
-        return price;
-    }
-
-    
     void setType(std::string type){
         typeServices=type;
     }
@@ -55,15 +28,43 @@ class MedicalServices{
     void setPrice(double Price){
         price=Price;
     }
+
     void changeType();
     void changeName();
     void changeDiagnosis();
     void changeDoctor();
     void changeTime();
     void changePrice();
-    void printService();
     void printServices();
-    int checkNumber();
+    double checkNumber();
+    bool checkTimeNumber(int number);
+    bool checkPriceNumber(double number);
+    public:
+    
+    MedicalServices(std::string type,std::string name,
+        std::string diagn,std::string doc,int time,double price):typeServices(type),
+        nameServices(name),diagnosis(diagn),doctor(doc),
+        time(time),price(price){}
+        
+    std::string getType(){
+        return typeServices;
+    }
+    std::string getName(){
+        return nameServices;
+    }
+    std::string getDiagnosis(){
+        return diagnosis;
+    }
+    std::string getDoctor(){
+        return doctor;
+    }
+    int getTime(){
+        return time;
+    }
+    double getPrice(){
+        return price;
+    }
+    void printService();
     bool switchServices();
     void editingServices();
     std::unique_ptr<MedicalServices> clone() const ;
